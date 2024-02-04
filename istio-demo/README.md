@@ -1,12 +1,12 @@
 # istio-basic-demo
-Basic istio installation & Demo
+Basic istio Installation & Demo
 
 ### Prerequisites
 
 List any prerequisites or dependencies that need to be installed before can use the project.
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- Kubernetes Cluster 4 CPU & 8 GB Memory
+- Kubernetes Cluster **4 CPU & 8 GB Memory**
 
 ### Installation
 
@@ -61,4 +61,8 @@ Step-by-step instructions to install the Istio.
    namespace/default labeled
    ```
 
-10. 
+10. Deploy HTTP-ECHO test application
+    ```
+    kubectl apply -f istio-demo/http-echo.yaml
+    ```
+11. Open browser [http://localhost/http-echo](http://localhost/http-echo)
