@@ -191,6 +191,8 @@ Check reponse code 200 & 503
 
  1. Install dashboard, prometheus, jaeger & service
  ```
+ kubectl apply -f samples/addons    
+ OR
  kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/kiali.yaml
  kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/prometheus.yaml
  kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/extras/zipkin.yaml
