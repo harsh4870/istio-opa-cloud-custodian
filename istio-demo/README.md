@@ -185,4 +185,18 @@ kubectl exec "$FORTIO_POD" -c fortio -- /usr/bin/fortio load -c 2 -qps 0 -n 20 -
 ```
 Check reponse code 200 & 503
 
-8. 
+### Observability
+
+ Kiali dashboard
+
+ 1. Install dashboard, prometheus, jaeger & service
+ ```
+ kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/kiali.yaml
+ kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/prometheus.yaml
+ kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/extras/zipkin.yaml
+ kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/jaeger.yaml
+ ```
+ 2. Open the dashboard
+ ```
+ istioctl dashboard kiali
+ ```
