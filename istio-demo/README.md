@@ -61,8 +61,42 @@ Step-by-step instructions to install the Istio.
    namespace/default labeled
    ```
 
-10. Deploy HTTP-ECHO test application
+10. Deploy HTTP-ECHO test application (Feel free to Skip)
     ```
     kubectl apply -f istio-demo/http-echo.yaml
     ```
 11. Open browser [http://localhost/http-echo](http://localhost/http-echo)
+
+### Install Book Info Demo App
+
+1. Book info install app
+   ```
+   kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml
+   ```
+
+2. Install the gateway
+   ```
+   kubectl apply -f samples/bookinfo/networking/bookinfo-gateway.yaml
+   ```
+
+3. Open browser [http://localhost/productpage](http://localhost/productpage)
+
+   Verify the **Round Robbin** on the browser, **Review** service's different version stars (red stars, black stars, no stars)
+   
+4. Apply **Default Destination** rules it uses the **subset**
+   ```
+   kubectl apply -f samples/bookinfo/networking/destination-rule-all.yaml
+   ```
+
+### Request Routing
+
+1. Route request to **version 1** of each microservice 
+```
+kubectl apply -f samples/bookinfo/networking/virtual-service-all-v1.yaml
+```
+2. Open browser [http://localhost/productpage](http://localhost/productpage)
+
+Verify request routing, on Browser no more stars in **review** service as all requests are going to **reviews:v1**
+
+3. 
+4. 
