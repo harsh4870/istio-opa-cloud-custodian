@@ -203,3 +203,9 @@ Check reponse code 200 & 503
  ```
  istioctl dashboard kiali
  ```
+
+#### Cleanup
+
+```
+samples/bookinfo/platform/kube/cleanup.sh
+```
