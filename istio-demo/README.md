@@ -98,5 +98,91 @@ kubectl apply -f samples/bookinfo/networking/virtual-service-all-v1.yaml
 
 Verify request routing, on Browser no more stars in **review** service as all requests are going to **reviews:v1**
 
-3. 
-4. 
+### Routing based on User identity
+
+**Specifc user** routed to **specific version** of service. You can also implement **JWT Claim** based routing to Istio.  
+
+ 1. Route **user** request to **version 2** of **review** microservice (stars enable)
+```
+kubectl apply -f samples/bookinfo/networking/virtual-service-reviews-test-v2.yaml
+```
+2. Open browser [http://localhost/productpage](http://localhost/productpage)
+
+3. **Sing In** jason/password, harsh/password
+
+Current request flow
+
+User Json -> productpage -> review:v2 -> rating
+User Any  -> productpage -> review
+
+Verify stars will be available product review section.
+
+### Fault Injection
+
+Add delay of few seconds from **review:v2 -> rating**
+
+1. Apply the changes
+```
+kubectl apply -f samples/bookinfo/networking/virtual-service-all-v1.yaml
+kubectl apply -f samples/bookinfo/networking/virtual-service-reviews-test-v2.yaml
+kubectl apply -f samples/bookinfo/networking/virtual-service-ratings-test-delay.yaml
+```
+
+You've discovered a bug. The reviews service has failed due to hard-coded timeouts in the microservices.
+
+The timeout between the reviews and ratings services is hard-coded at 10 seconds, thus as predicted, the 7-second delay you added has no effect on the reviews service. Between the product page and the reviews service, there is also a hard-coded timeout, which is 3 seconds plus 1 retry for a total of 6 seconds. The call to reviews on the product page therefore times out too soon and produces an error after 6 seconds.
+
+### Circuit Breaking
+
+Break the circuit if not working
+
+1. Install the httpbin
+```
+kubectl apply -f samples/httpbin/httpbin.yaml
+```
+
+2. Create destination rule
+```
+kubectl apply -f - <<EOF
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: httpbin
+spec:
+  host: httpbin
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 1
+      http:
+        http1MaxPendingRequests: 1
+        maxRequestsPerConnection: 1
+    outlierDetection:
+      consecutive5xxErrors: 1
+      interval: 1s
+      baseEjectionTime: 3m
+      maxEjectionPercent: 100
+EOF
+```
+
+3. Install **fortio** to hit requests
+```
+kubectl apply -f samples/httpbin/sample-client/fortio-deploy.yaml
+```
+
+4. Login to **fortio** POD
+```
+export FORTIO_POD=$(kubectl get pods -l app=fortio -o 'jsonpath={.items[0].metadata.name}')
+```
+5. Hit one request to **httpbin** to check reponse
+```
+kubectl exec "$FORTIO_POD" -c fortio -- /usr/bin/fortio curl -quiet http://httpbin:8000/get
+```
+
+6. Bombard request & break circuit
+```
+kubectl exec "$FORTIO_POD" -c fortio -- /usr/bin/fortio load -c 2 -qps 0 -n 20 -loglevel Warning http://httpbin:8000/get
+```
+Check reponse code 200 & 503
+
+8. 
